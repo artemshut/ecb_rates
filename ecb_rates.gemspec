@@ -1,6 +1,7 @@
+require 'ecb_rates/version'
 Gem::Specification.new do |spec|
   spec.name          = "ecb_rates"
-  spec.version       = "0.0.1"
+  spec.version       = ECBRates::Version
   spec.authors       = ["Artsiom Shut"]
   spec.email         = ["artemshut@gmail.com"]
   spec.description   = %q{ECB rates for UOL.}
