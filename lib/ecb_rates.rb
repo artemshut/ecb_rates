@@ -28,7 +28,7 @@ class ECBRates
       end
     end
 
-    #Parse xml response from ECB
+    # Parse xml response from ECB
     def get_rate_for currency, converted_date
       rates_for_period = Hash.from_xml(get_rates_from_ecb)
       rates_for_chosed_date = rates_for_period["Envelope"]["Cube"]["Cube"].detect { |h| h["time"] == converted_date }
