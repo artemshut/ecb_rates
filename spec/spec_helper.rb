@@ -1,0 +1,1 @@
+require 'ecb_rates'
