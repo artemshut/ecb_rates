@@ -32,7 +32,7 @@ class ECBRates
     def get_rate_for currency, converted_date
       rates_for_period = Hash.from_xml(get_rates_from_ecb)
       rates_for_chosen_date = rates_for_period["Envelope"]["Cube"]["Cube"].detect { |h| h["time"] == converted_date }
-      return puts "######## No rate for this date. May be it was a weekend? ########" unless rates_for_chosen_date
+      return puts "######## No rate for this date. May be it was a weekend or rate not updated yet? ########" unless rates_for_chosen_date
       rate_with_currency = rates_for_chosen_date["Cube"].detect { |h| h["currency"] == currency }
       get_result_with_check rate_with_currency
     end
