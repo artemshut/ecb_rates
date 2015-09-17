@@ -12,7 +12,7 @@ $ gem install ecb_rates
 
 ```
 # date should be in format '23.12.2014'
-ECBRates.rates_for 'currency_name', 'date'
+ECBRates.rate 'currency_name', 'date'
 ```
 As improvements for future we could add a migration generator,
 which adds xml response to preferences table or special file and updates it every day
