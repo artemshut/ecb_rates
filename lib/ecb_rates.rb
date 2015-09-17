@@ -14,7 +14,7 @@ class ECBRates
   class << self
 
     # Example:
-    #   >> ECBRates.rate 'usd', '14.09.2015'
+    #   >> ECBRates.rates_for 'usd', '14.09.2015'
     #   => 1.2345
     #
     # Arguments:
@@ -23,8 +23,7 @@ class ECBRates
     def rate(currency, date = Date.today)
       converted_date = date_processing(date)
       return unless converted_date
-      rates_for_period = Hash.from_xml(ecb_rates)
-      rates_for_chosen_date = rates_for_period["Envelope"]["Cube"]["Cube"].detect { |h| h["time"] == converted_date }
+      rates_for_chosen_date = parsed_ecb_rates(converted_date)
       if rates_for_chosen_date
         rate_with_currency = rates_for_chosen_date["Cube"].detect { |h| h["currency"] == currency.upcase }
         check_result(rate_with_currency)
@@ -42,6 +41,12 @@ class ECBRates
       request = Net::HTTP::Post.new(uri.path)
       response = http.request(request)
       response.body
+    end
+
+    # Return hash parsed from xml response from ECB
+    def parsed_ecb_rates(converted_date)
+      rates_for_period = Hash.from_xml(ecb_rates)
+      rates_for_period["Envelope"]["Cube"]["Cube"].detect { |h| h["time"] == converted_date }
     end
 
     # Return currency value if present or no rate message
