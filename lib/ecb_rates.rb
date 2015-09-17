@@ -56,7 +56,9 @@ class ECBRates
     end
 
     # Convert date from parameters into a version, acceptable by ECB service
-    def convert date; date.is_a?(String) ? Date.parse(date).to_s : date.to_s end
+    def convert date
+      date.is_a?(String) ? Date.parse(date).to_s : date.to_s 
+    end
 
   end
 
