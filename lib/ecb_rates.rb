@@ -14,7 +14,7 @@ class ECBRates
   class << self
 
     # Example:
-    #   >> ECBRates.rates_for 'usd', '14.09.2015'
+    #   >> ECBRates.rate 'usd', '14.09.2015'
     #   => 1.2345
     #
     # Arguments:
