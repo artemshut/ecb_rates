@@ -2,6 +2,7 @@ require 'net/http'
 require 'uri'
 require 'active_support/core_ext/hash'
 require 'date'
+require 'logger'
 
 class ECBRates
 
@@ -19,44 +20,59 @@ class ECBRates
     # Arguments:
     #   currency: (String)
     #   date: (String)
-    def rates_for currency, date = Date.today
-      converted_date = convert date
-      if converted_date > Date.today.to_s
-        puts "######## The date should be in the past. ########"
+    def rate(currency, date = Date.today)
+      converted_date = date_processing(date)
+      return unless converted_date
+      rates_for_period = Hash.from_xml(ecb_rates)
+      rates_for_chosen_date = rates_for_period["Envelope"]["Cube"]["Cube"].detect { |h| h["time"] == converted_date }
+      if rates_for_chosen_date
+        rate_with_currency = rates_for_chosen_date["Cube"].detect { |h| h["currency"] == currency.upcase }
+        check_result(rate_with_currency)
       else
-        get_rate_for currency.upcase, converted_date
+        write_log('No rate for this date. May be it was a weekend or rate not updated yet?')
       end
     end
 
-    # Parse xml response from ECB
-    def get_rate_for currency, converted_date
-      rates_for_period = Hash.from_xml(get_rates_from_ecb)
-      rates_for_chosen_date = rates_for_period["Envelope"]["Cube"]["Cube"].detect { |h| h["time"] == converted_date }
-      return puts "######## No rate for this date. May be it was a weekend or rate not updated yet? ########" unless rates_for_chosen_date
-      rate_with_currency = rates_for_chosen_date["Cube"].detect { |h| h["currency"] == currency }
-      get_result_with_check rate_with_currency
-    end
+    private
 
     # Return xml with response from ECB
-    def get_rates_from_ecb
-      uri = URI.parse ECB_URL_90
-      http = Net::HTTP.new uri.host, uri.port
-      request = Net::HTTP::Post.new uri.path
-      response = http.request request
+    def ecb_rates
+      uri = URI.parse(ECB_URL_90)
+      http = Net::HTTP.new(uri.host, uri.port)
+      request = Net::HTTP::Post.new(uri.path)
+      response = http.request(request)
       response.body
     end
 
     # Return currency value if present or no rate message
-    def get_result_with_check rate_with_currency
+    def check_result(rate_with_currency)
       if rate_with_currency && rate_with_currency["rate"]
         rate_with_currency["rate"].to_f
       else
-        puts "######## Service have no such currency. Check it please. ########"
+        write_log('Service have no such currency. Check it please.')
       end
     end
 
     # Convert date from parameters into a version, acceptable by ECB service
-    def convert date; date.is_a?(String) ? Date.parse(date).to_s : date.to_s end
+    def date_processing(date)
+      begin
+        converted_date = date.is_a?(String) ? Date.parse(date).to_s : date.to_s
+        if converted_date > Date.today.to_s || converted_date < '1999-01-01'
+          write_log('Date is not correct.')
+        else
+          converted_date
+        end
+      rescue => e
+        write_log(e.message)
+      end
+    end
+
+    def write_log(message)
+      logger = Logger.new(STDOUT)
+      logger.level = Logger::WARN
+      logger.warn(message)
+      nil
+    end
 
   end
 
