@@ -11,7 +11,7 @@ $ gem install ecb_rates
 
 
 ```
-# date should be in format '1.1.2015'
+# date should be in format '23.12.2014'
 ECBRates.rates_for 'currency_name', 'date'
 ```
 As improvements for future we could add a migration generator,
