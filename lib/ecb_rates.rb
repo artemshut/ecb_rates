@@ -13,7 +13,7 @@ class ECBRates
   class << self
 
     # Example:
-    #   >> ECBRates.rates_for 'usd', 14.09.2015
+    #   >> ECBRates.rates_for 'usd', '14.09.2015'
     #   => 1.2345
     #
     # Arguments:
@@ -31,17 +31,10 @@ class ECBRates
     # Parse xml response from ECB
     def get_rate_for currency, converted_date
       rates_for_period = Hash.from_xml(get_rates_from_ecb)
-      rates_for_chosed_date = rates_for_period["Envelope"]["Cube"]["Cube"].detect { |h| h["time"] == converted_date }
-      if rates_for_chosed_date
-        rate_with_currency = rates_for_chosed_date["Cube"].detect { |h| h["currency"] == currency }
-        if rate_with_currency && rate_with_currency["rate"]
-          rate_with_currency["rate"].to_f
-        else
-          puts "######## Service have no such currency. Check it please. ########"
-        end
-      else
-        puts "######## No rate for this date. May be it was a weekend? ########"
-      end
+      rates_for_chosen_date = rates_for_period["Envelope"]["Cube"]["Cube"].detect { |h| h["time"] == converted_date }
+      return puts "######## No rate for this date. May be it was a weekend? ########" unless rates_for_chosen_date
+      rate_with_currency = rates_for_chosen_date["Cube"].detect { |h| h["currency"] == currency }
+      get_result_with_check rate_with_currency
     end
 
     # Return xml with response from ECB
@@ -51,6 +44,15 @@ class ECBRates
       request = Net::HTTP::Post.new uri.path
       response = http.request request
       response.body
+    end
+
+    # Return currency value if present or no rate message
+    def get_result_with_check rate_with_currency
+      if rate_with_currency && rate_with_currency["rate"]
+        rate_with_currency["rate"].to_f
+      else
+        puts "######## Service have no such currency. Check it please. ########"
+      end
     end
 
     # Convert date from parameters into a version, acceptable by ECB service
