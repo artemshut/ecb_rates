@@ -1,9 +1,9 @@
 require 'spec_helper'
 
 describe ECBRates do
-  it "should return currency without date parameter for today" do
-    rate_for_usd = ECBRates.rates_for 'usd'
-    expect(rate_for_usd).not_to be_nil
+  it "should return valid currency parameter for 14.09.2015" do
+    rate_for_usd = ECBRates.rates_for 'usd', '14.09.2015'
+    expect(rate_for_usd).to eq(1.1305)
   end
 
   it "should return weekend message" do
