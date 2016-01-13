@@ -3,6 +3,10 @@ require 'uri'
 require 'active_support/core_ext/hash'
 require 'date'
 
+
+
+
+
 class ECBRates
 
   # URLs for daily/90 days/from 1999 response after calling ECB
