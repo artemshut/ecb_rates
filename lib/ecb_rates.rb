@@ -4,17 +4,13 @@ require 'active_support/core_ext/hash'
 require 'date'
 require 'logger'
 
-
-
-
-
 class ECBRates
 
   # URLs for daily/90 days/from 1999 response after calling ECB
   ECB_URL_DAILY = 'http://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml'.freeze
   ECB_URL_90 = 'http://www.ecb.europa.eu/stats/eurofxref/eurofxref-hist-90d.xml'.freeze
   ECB_URL_FROM_BEGINNING = 'https://www.ecb.europa.eu/stats/eurofxref/eurofxref-hist.xml'.freeze
-  INITIAL_DATE = '1999-01-01'
+  INITIAL_DATE = '1999-01-01'.freeze
 
   class << self
 
@@ -48,7 +44,7 @@ class ECBRates
 
     # Return hash parsed from xml response from ECB
     def parsed_ecb_rates(converted_date)
-      ecb_rates["Envelope"]["Cube"]["Cube"].detect { |rate| rate["time"] == converted_date }
+      ecb_rates.dig("Envelope", "Cube", "Cube").detect { |rate| rate["time"] == converted_date }
     end
 
     # Return currency value if present or no rate message
